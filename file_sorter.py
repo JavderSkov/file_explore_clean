@@ -28,26 +28,32 @@ EXTENSION_MAP = {
     '.cpp': 'Code', '.c': 'Code', '.java': 'Code', '.json': 'Code'
 }
 
-def sort_downloads():
-    # Define paths
-    home_dir = Path.home()
-    downloads_dir = home_dir / 'Downloads'
-    sorter_dir = downloads_dir / 'sorter'
+def sort_folder():
+    print("--- File Sorter ---")
+    # Ask the user for the directory path
+    user_input = input("Enter the full path of the folder or drive to sort (e.g., C:\\Users\\Name\\Desktop or /Users/Name/Desktop): ").strip()
+    
+    # Convert input to a Path object
+    source_dir = Path(user_input)
 
-    # Check if Downloads directory exists
-    if not downloads_dir.exists():
-        print(f"Error: Could not find Downloads folder at {downloads_dir}")
+    # Check if the entered directory exists and is a folder
+    if not source_dir.exists():
+        print(f"Error: Could not find the path at '{source_dir}'.")
+        return
+    if not source_dir.is_dir():
+        print(f"Error: '{source_dir}' is not a valid folder.")
         return
 
-    # Create the base 'sorter' directory if it doesn't exist
+    # Create the base 'sorter' directory inside the chosen folder
+    sorter_dir = source_dir / 'sorter'
     sorter_dir.mkdir(exist_ok=True)
-    print(f"Sorting files into: {sorter_dir}")
+    print(f"Sorting files into: {sorter_dir}\n")
 
     # Keep track of how many files we moved
     moved_count = 0
 
-    # Iterate over all items in the Downloads directory
-    for item in downloads_dir.iterdir():
+    # Iterate over all items in the chosen directory
+    for item in source_dir.iterdir():
         # Skip the sorter directory itself to avoid recursive moving
         if item.name == 'sorter':
             continue
@@ -72,7 +78,7 @@ def sort_downloads():
         target_path = target_folder / item.name
         
         # Check if an item with the same name already exists in the target folder
-        # If it does, we can append a number to the name to avoid overwriting
+        # If it does, append a number to the name to avoid overwriting
         counter = 1
         while target_path.exists():
             if item.is_file():
@@ -90,7 +96,7 @@ def sort_downloads():
         except Exception as e:
             print(f"Error moving {item.name}: {e}")
 
-    print(f"\nSorting complete! Successfully moved {moved_count} items...")
+    print(f"\nSorting complete! Successfully moved {moved_count} items.")
 
 if __name__ == "__main__":
-    sort_downloads()
+    sort_folder()
